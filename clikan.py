@@ -247,9 +247,12 @@ def display():
         no_wrap=True,
         footer="clikan"
     )
-    table.add_column('[bold green]in-progress[/bold green]', no_wrap=True)
+    table.add_column('[bold cyan]next[/bold cyan]', no_wrap=True)
+    table.add_column('[bold magenta]doing[/bold magenta]', no_wrap=True)
+    table.add_column('[bold blue]wait[/bold blue]', no_wrap=True)
+    table.add_column('[bold blue]hold[/bold blue]', no_wrap=True)
     table.add_column(
-        '[bold magenta]done[/bold magenta]',
+        '[bold green]done[/bold green]',
         no_wrap=True,
         footer="v.{}".format(VERSION)
     )
