@@ -117,7 +117,7 @@ def add(task):
         click.echo('Task must be at most %s chars. Brevity counts.'
                    % taskname_length)
     else:
-        todos, inprogs, dones = split_items(config, dd)
+        todos, nexts, doings, waits, holds, dones = split_items(config, dd)
         if ('limits' in config and 'todo' in config['limits'] and
                 int(config['limits']['todo']) <= len(todos)):
             click.echo('No new todos, limit reached already.')
@@ -163,7 +163,7 @@ def promote(id):
     """Promote task"""
     config = read_config_yaml()
     dd = read_data(config)
-    todos, inprogs, dones = split_items(config, dd)
+    todos, nexts, doings, waits, holds, dones = split_items(config, dd)
 
     try:
         item = dd['data'].get(int(id))
@@ -267,14 +267,17 @@ def display():
     """Show tasks in clikan"""
     config = read_config_yaml()
     dd = read_data(config)
-    todos, inprogs, dones = split_items(config, dd)
+    todos, nexts, doings, waits, holds, dones = split_items(config, dd)
     if 'limits' in config and 'done' in config['limits']:
         dones = dones[0:int(config['limits']['done'])]
     else:
         dones = dones[0:10]
 
     todos = '\n'.join([str(x) for x in todos])
-    inprogs = '\n'.join([str(x) for x in inprogs])
+    nexts = '\n'.join([str(x) for x in nexts])
+    doings = '\n'.join([str(x) for x in doings])
+    waits = '\n'.join([str(x) for x in waits])
+    holds = '\n'.join([str(x) for x in holds])
     dones = '\n'.join([str(x) for x in dones])
 
     table = Table(show_header=True, show_footer=True)
@@ -293,7 +296,7 @@ def display():
         footer="v.{}".format(VERSION)
     )
 
-    table.add_row(todos, inprogs, dones)
+    table.add_row(todos, nexts, doings, waits, holds, dones)
     console.print(table)
 
 
@@ -349,18 +352,27 @@ def read_config_yaml():
 
 def split_items(config, dd):
     todos = []
-    inprogs = []
+    nexts = []
+    doings = []
+    waits = []
+    holds = []
     dones = []
 
     for key, value in dd['data'].items():
         if value[0] == 'todo':
             todos.append("[%d] %s" % (key, value[1]))
-        elif value[0] == 'inprogress':
-            inprogs.append("[%d] %s" % (key, value[1]))
+        elif value[0] == 'next':
+            nexts.append("[%d] %s" % (key, value[1]))
+        elif value[0] == 'doing':
+            doings.append("[%d] %s" % (key, value[1]))
+        elif value[0] == 'wait':
+            waits.append("[%d] %s" % (key, value[1]))
+        elif value[0] == 'hold':
+            holds.append("[%d] %s" % (key, value[1]))
         else:
             dones.insert(0, "[%d] %s" % (key, value[1]))
 
-    return todos, inprogs, dones
+    return todos, nexts, doings, waits, holds, dones
 
 
 def timestamp():
