@@ -177,16 +177,34 @@ def promote(id):
                     % config['limits']['wip']
                 )
             else:
-                click.echo('Promoting task %s to in-progress.' % id)
+                click.echo('Promoting task %s to next.' % id)
                 dd['data'][int(id)] = [
-                    'inprogress',
+                    'next',
                     item[1], timestamp(),
                     item[3]
                 ]
                 write_data(config, dd)
                 if ('repaint' in config and config['repaint']):
                     display()
-        elif item[0] == 'inprogress':
+        elif item[0] == 'next':
+            click.echo('Promoting task %s to doing.' % id)
+            dd['data'][int(id)] = ['doing', item[1], timestamp(), item[3]]
+            write_data(config, dd)
+            if ('repaint' in config and config['repaint']):
+                display()
+        elif item[0] == 'doing':
+            click.echo('Promoting task %s to wait.' % id)
+            dd['data'][int(id)] = ['wait', item[1], timestamp(), item[3]]
+            write_data(config, dd)
+            if ('repaint' in config and config['repaint']):
+                display()
+        elif item[0] == 'wait':
+            click.echo('Promoting task %s to hold.' % id)
+            dd['data'][int(id)] = ['hold', item[1], timestamp(), item[3]]
+            write_data(config, dd)
+            if ('repaint' in config and config['repaint']):
+                display()
+        elif item[0] == 'hold':
             click.echo('Promoting task %s to done.' % id)
             dd['data'][int(id)] = ['done', item[1], timestamp(), item[3]]
             write_data(config, dd)
@@ -208,12 +226,30 @@ def regress(id):
     if item is None:
         click.echo('No existing task with that id.')
     elif item[0] == 'done':
-        click.echo('Regressing task %s to in-progress.' % id)
-        dd['data'][int(id)] = ['inprogress', item[1], timestamp(), item[3]]
+        click.echo('Regressing task %s to hold.' % id)
+        dd['data'][int(id)] = ['hold', item[1], timestamp(), item[3]]
         write_data(config, dd)
         if ('repaint' in config and config['repaint']):
             display()
-    elif item[0] == 'inprogress':
+    elif item[0] == 'hold':
+        click.echo('Regressing task %s to wait.' % id)
+        dd['data'][int(id)] = ['wait', item[1], timestamp(), item[3]]
+        write_data(config, dd)
+        if ('repaint' in config and config['repaint']):
+            display()
+    elif item[0] == 'wait':
+        click.echo('Regressing task %s to doing.' % id)
+        dd['data'][int(id)] = ['doing', item[1], timestamp(), item[3]]
+        write_data(config, dd)
+        if ('repaint' in config and config['repaint']):
+            display()
+    elif item[0] == 'doing':
+        click.echo('Regressing task %s to next.' % id)
+        dd['data'][int(id)] = ['next', item[1], timestamp(), item[3]]
+        write_data(config, dd)
+        if ('repaint' in config and config['repaint']):
+            display()
+    elif item[0] == 'next':
         click.echo('Regressing task %s to todo.' % id)
         dd['data'][int(id)] = ['todo', item[1], timestamp(), item[3]]
         write_data(config, dd)
